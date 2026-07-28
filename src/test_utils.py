@@ -1,5 +1,5 @@
 import unittest
-from utils import split_nodes_delimiter
+from utils import split_nodes_delimiter, extract_markdown_links, extract_markdown_images
 from textnode import TextNode, TextType
 
 class TestUtils(unittest.TestCase):
@@ -21,3 +21,26 @@ class TestUtils(unittest.TestCase):
         delimited = split_nodes_delimiter([node], "_", TextType.ITALIC)
         self.assertEqual(delimited, [TextNode("This is text with an ", TextType.TEXT), TextNode("italic", TextType.ITALIC), TextNode(" word", TextType.TEXT)])
 
+
+
+    # MARKDOWN EXTRACTOR TESTS
+
+    def test_extract_markdown_links(self):
+        matches_none = extract_markdown_links("This is text with an ![image](https://i.imgur.com/zjjcJKZ.png)")
+        matches = extract_markdown_links("This is text with a [link](https://i.imgur.com/zjjcJKZ.png)")
+        matches_more = extract_markdown_links("This is text with a [link](https://i.imgur.com/zjjcJKZ.png) and another [link again](https://i.imgur.com/zjjcJKZ.png)")
+
+        self.assertEqual(matches, [("link", "https://i.imgur.com/zjjcJKZ.png")])
+        self.assertEqual(matches_none, [])
+        self.assertEqual(matches_more, [("link", "https://i.imgur.com/zjjcJKZ.png"), ("link again", "https://i.imgur.com/zjjcJKZ.png")])
+
+    def test_extract_markdown_image(self):
+        matches = extract_markdown_images("This is text with an ![image](https://i.imgur.com/zjjcJKZ.png)")
+        matches_none  = extract_markdown_images("This is text with a [link](https://i.imgur.com/zjjcJKZ.png)")
+        matches_more = extract_markdown_images("This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and another ![image again](https://i.imgur.com/zjjcJKZ.png)")
+        matches_second  = extract_markdown_images("This is text with a [link](https://i.imgur.com/zjjcJKZ.png) and an ![image](https://i.imgur.com/zjjcJKZ.png)")
+
+        self.assertEqual(matches, [("image", "https://i.imgur.com/zjjcJKZ.png")])
+        self.assertEqual(matches_none, [])
+        self.assertEqual(matches_more, [("image", "https://i.imgur.com/zjjcJKZ.png"), ("image again", "https://i.imgur.com/zjjcJKZ.png")])
+        self.assertEqual(matches_second, [("image", "https://i.imgur.com/zjjcJKZ.png")])
