@@ -1,5 +1,5 @@
 import unittest
-from utils import split_nodes_delimiter, extract_markdown_links, extract_markdown_images, split_nodes_image,split_nodes_link,text_to_textnodes
+from utils import split_nodes_delimiter, extract_markdown_links, extract_markdown_images, split_nodes_image,split_nodes_link,text_to_textnodes, markdown_to_blocks
 from textnode import TextNode, TextType
 
 class TestUtils(unittest.TestCase):
@@ -90,3 +90,59 @@ class TestUtils(unittest.TestCase):
             TextNode(" and a ", TextType.TEXT),
             TextNode("link", TextType.LINK, "https://boot.dev"),
         ])
+
+
+    def test_markdown_to_block(self):
+        
+        md = """
+This is **bolded** paragraph
+
+This is another paragraph with _italic_ text and `code` here
+This is the same paragraph on a new line
+
+- This is a list
+- with items
+"""
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(
+            blocks,
+            [
+                "This is **bolded** paragraph",
+                "This is another paragraph with _italic_ text and `code` here\nThis is the same paragraph on a new line",
+                "- This is a list\n- with items",
+            ],
+        )
+    def test_markdown_to_block_collapse_newlines(self):
+        
+        md = """
+This is **bolded** paragraph
+
+
+
+
+
+
+  
+
+    
+
+
+    
+
+This is another paragraph with _italic_ text and `code` here
+This is the same paragraph on a new line
+
+- This is a list
+- with items
+"""
+        blocks = markdown_to_blocks(md)
+        self.assertEqual(
+            blocks,
+            [
+                "This is **bolded** paragraph",
+                "This is another paragraph with _italic_ text and `code` here\nThis is the same paragraph on a new line",
+                "- This is a list\n- with items",
+            ],
+        )
+
+    

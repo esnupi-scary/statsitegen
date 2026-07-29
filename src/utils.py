@@ -78,3 +78,13 @@ def extract_markdown_images(text:str):
 
 def extract_markdown_links(text:str):
     return re.findall(r"(?<!!)\[(.*?)\]\((.*?)\)", text);
+
+
+def markdown_to_blocks(markdown:str)->list[str]:
+    blocks = markdown.split("\n\n")
+    result = []
+    for block in blocks:
+        cleaned_block = block.strip()
+        if cleaned_block != "":
+            result.append(cleaned_block)
+    return result
