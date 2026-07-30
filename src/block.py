@@ -35,3 +35,13 @@ def block_to_block_type(block: str) -> BlockType:
         if ol_cond:
             return BlockType.ORDERED_LIST
     return BlockType.PARAGRAPH
+
+
+def markdown_to_blocks(markdown:str)->list[str]:
+    blocks = markdown.split("\n\n")
+    result = []
+    for block in blocks:
+        cleaned_block = block.strip()
+        if cleaned_block != "":
+            result.append(cleaned_block)
+    return result

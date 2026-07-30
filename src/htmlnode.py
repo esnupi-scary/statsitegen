@@ -1,5 +1,4 @@
 
-
 class HTMLNode:
     def __init__(self, tag=None, value=None, children=None, props=None):
         self.tag = tag
@@ -8,7 +7,7 @@ class HTMLNode:
         self.props = props 
 
     def to_html(self):
-        raise NotImplementedError()
+        raise NotImplementedError("this is for overloading only!")
 
     def props_to_html(self) -> str:
         if not self.props:

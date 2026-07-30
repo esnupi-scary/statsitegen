@@ -14,7 +14,7 @@ class TestTextNode(unittest.TestCase):
     def test_def(self):
         node = HTMLNode("testiiiing", None, None, {"href": "test", "rel":"test"})
         self.assertEqual(node.tag, "testiiiing")
-        
+
 
 if __name__ == "__main__":
     unittest.main()
