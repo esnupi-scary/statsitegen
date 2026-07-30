@@ -1,5 +1,7 @@
 
 
+import re
+
 from block import BlockType, block_to_block_type, markdown_to_blocks
 from htmlnode import HTMLNode
 from parentnode import ParentNode
@@ -28,7 +30,6 @@ def block_to_htmlnode(block: str ,type: BlockType) -> HTMLNode:
             # created a TextNode manually to do all this
             # trim the code blocks backticks from the block before processing
             sanitized_block = block.replace("```\n","").replace("```","")
-
             return ParentNode("pre", [text_node_to_html_node(TextNode(sanitized_block, TextType.CODE))])
         case BlockType.QUOTE:
             return simple_block_to_html_node(block, "blockquote")
@@ -36,21 +37,29 @@ def block_to_htmlnode(block: str ,type: BlockType) -> HTMLNode:
         # every new line will have to be wrapped in a <li> tag
         # this might need a separate function
         case BlockType.UNORDERED_LIST:
-            p_node = ParentNode("ul", [])
-            raise NotImplementedError("unordered list")
+            return list_block_to_html_node(block)
         case BlockType.ORDERED_LIST:
-            p_node = ParentNode("ol", [])
-            raise NotImplementedError("unordered list")
+            return list_block_to_html_node(block, is_ordered=True)
         case _:
             raise Exception("Encountered unknown BlockType!")
 
 
 def simple_block_to_html_node(block: str, parent_tag: str) -> ParentNode:
     replaced_str = block.replace("\n", " ")
-    text_nodes = text_to_textnodes(replaced_str)
-    children = list(map(lambda node: text_node_to_html_node(node), text_nodes))
-    p_node = ParentNode(parent_tag, children)
+    p_node = ParentNode(parent_tag, text_to_children(replaced_str))
     return p_node     
+
+def list_block_to_html_node(block: str, is_ordered:bool=False):
+    children = []
+    regex = r"- (.+)"
+    if is_ordered:
+        regex = r"\d\. (.+)"
+    for item in re.findall(regex, block):
+        prepared_item = text_to_children(item)
+        # must be encapsulated in a list item tag - <li>
+        children.append(ParentNode("li", prepared_item))
+    p_node = ParentNode("ol" if is_ordered else "ul", children)
+    return p_node
 
 def text_to_heading_tag(block:str)->str:
     count_hash = 0
@@ -66,3 +75,7 @@ def text_to_heading_tag(block:str)->str:
         # raise ValueError("improper header!! ")
         return "p"
 
+def text_to_children(text:str):
+    text_nodes = text_to_textnodes(text)
+    children = list(map(lambda node: text_node_to_html_node(node), text_nodes))
+    return children
