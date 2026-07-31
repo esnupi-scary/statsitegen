@@ -16,11 +16,8 @@ def copy_recurse(source:str, destination:str):
     if not os.path.exists(destination):
         os.mkdir(destination)
     for content in os.listdir(source):
-        print(content)
         if os.path.isdir(f"{source}/{content}"):
             copy_recurse(f"{source}/{content}", f"{destination}/{content}")
         else:
             shutil.copy(f"{source}/{content}", destination)
     pass
-
-copy_contents("static", "public")

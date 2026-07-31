@@ -15,15 +15,23 @@ def block_to_block_type(block: str) -> BlockType:
     if len(code_type) == 3:
         return BlockType.CODE
     # simple delimiters (unordered list, heading, quote block)
-    # unordered list
-    if len(re.findall(r"- .+", block)) > 0:
-        return BlockType.UNORDERED_LIST
+    delims = {"- ":BlockType.UNORDERED_LIST, ">": BlockType.QUOTE }
+    for delimiter in delims: 
+        if block.startswith(delimiter):
+            for line in block.split("\n"):
+                if not line.startswith(delimiter):
+                    return BlockType.PARAGRAPH
+            return delims[delimiter]
+    #. REPLACED BECAUSE OF A BUG WITH REGEX. OF COURSE IT'S A BUG WITH REGEX, WHAT ELSE COULD IT HAVE BEEN 
+    # if len(re.findall(r"- .+", block)) > 0:
+    #     return BlockType.UNORDERED_LIST
+    # quote
+    # if len(re.findall(r">.*", block)) > 0:
+    #     print("Got here")
+    #     return BlockType.QUOTE
     # heading
     if len(re.findall(r"#{1,6} .+", block)) > 0:
         return BlockType.HEADING
-    # quote
-    if len(re.findall(r">.+", block)) > 0:
-        return BlockType.QUOTE
     # complex delimiter - Ordered list (incrementing digit + . and space )
     # ordered list 
     ol_numbers = re.findall(r"(\d)\. .+", block)
