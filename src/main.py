@@ -6,7 +6,7 @@ import sys
 def main():
     basepath = sys.argv[1] if sys.argv else "/"
     print(basepath)
-    copy_contents("static","public")
+    copy_contents("static","docs")
     generate_pages_recursive("content", "template.html", "docs", basepath)
 
 main()
