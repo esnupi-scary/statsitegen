@@ -10,7 +10,7 @@ def extract_title(markdown:str):
     else:
         raise Exception("No title header found!")
 
-def generate_page(from_path, template_path, dest_path):
+def generate_page(from_path, template_path, dest_path, basepath):
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
     if not from_path:
         raise ValueError("from_path not provided!")
@@ -31,13 +31,13 @@ def generate_page(from_path, template_path, dest_path):
     node = markdown_to_html_node(markdown_content)
     body = node.to_html()
     title = extract_title(markdown_content)
-    final_html = html_content.replace("{{ Content }}", body).replace("{{ Title }}", title)
+    final_html = html_content.replace("{{ Content }}", body).replace("{{ Title }}", title).replace('src="/', f'src="{basepath}').replace('href="/', f'href="{basepath}')
 
     os.makedirs("/".join(dest_path.split("/")[:-1],), exist_ok=True)
     with open(dest_path, 'w') as f:
         f.write(final_html)
 
-def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, basepath):
 
     if not dir_path_content:
         raise ValueError("from_path not provided!")
@@ -51,9 +51,9 @@ def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
     for content in os.listdir(dir_path_content):
         print(content)
         if os.path.isdir(f"{dir_path_content}/{content}"):
-            generate_pages_recursive(f"{dir_path_content}/{content}", template_path, f"{dest_dir_path}/{content}")
+            generate_pages_recursive(f"{dir_path_content}/{content}", template_path, f"{dest_dir_path}/{content}", basepath)
         else:
             dest_dir_path_to_html = content.split(".md")[0]+".html"
-            generate_page(f"{dir_path_content}/{content}", template_path, f"{dest_dir_path}/{dest_dir_path_to_html}")
+            generate_page(f"{dir_path_content}/{content}", template_path, f"{dest_dir_path}/{dest_dir_path_to_html}", basepath)
 
     
